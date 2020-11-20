@@ -1,5 +1,3 @@
-#setwd("/Users/Ege/Google Drive/ABROAD/University of Warsaw/Free Works/nieruch/otomoto")
-
 options(warn=-1)
 Sys.setlocale("LC_ALL", 'en_US.UTF-8')
 
@@ -9,7 +7,7 @@ pck <- pck_[!(pck_ %in% installed.packages()[,"Package"])]
 if(length(pck)){
   cat(paste0("Installing: ", pck, "\n"))
   install.packages(pck, repos = 'https://cran.rstudio.com/')
-} # if you don't have these packages, install them all
+}
 
 suppressWarnings(suppressMessages(invisible(lapply(pck_, require, character.only = TRUE))))
 setwd(here())
@@ -39,10 +37,6 @@ get_price <- function(html){
   price_unit <- as.factor(substr(price_,nchar(price_)-2,nchar(price_)))
   price_ <- gsub(' ','',price_)
   price_ <- as.numeric(substr(price_,1,nchar(price_)-3))
-
-  # assign("price_",price_, envir = .GlobalEnv)
-  # assign("price_unit",price_unit, envir = .GlobalEnv)
-
   price_ <- data.table(price_, price_unit)
   return(price_)
 }
@@ -69,9 +63,8 @@ get_links <- function(html){
   return(links)
 }
 
-# do for all
+
 get_parameters <- function(html){
-  # https://stackoverflow.com/questions/40399229/cbind-2-dataframes-with-different-number-of-rows
   for(i in 1:length(get_links(html))){
     links <- read_html(get_links(html)[i])
     params_label <- links %>% html_nodes('.offer-params__label') %>% html_text()
@@ -93,9 +86,6 @@ get_parameters <- function(html){
   rownames(params_) <- 1:nrow(params_)
   return(data.table(params_))
 }
-
-
-
 
 combine_all <- function(){
   suppressWarnings(suppressMessages(require(here)))
@@ -206,21 +196,19 @@ car_train <- function(portion = 0.7, nround = 20000, output_file = "xgb.model"){
 }
 
 
-predict_car <- function(data, year, km, color, city, brand, model, ad_date){
-  xgb_model <- xgb.load(paste0(here(),'/data/xgb.model'))
+# predict_car <- function(data, year, km, color, city, brand, model, ad_date){
+#   xgb_model <- xgb.load(paste0(here(),'/data/xgb.model'))
   
-  city <-  ifelse(city == "istanbul", "İstanbul", city)
-  deploy_values <- t(data.matrix(c(as.numeric(substr(Sys.Date(),1,4)) - as.numeric(year),
-                                   km, 
-                                   which(levels(data$color)==str_to_title(color)), 
-                                   which(levels(data$city)==str_to_title(city)), 
-                                   which(levels(data$brand)==str_to_title(brand)), 
-                                   which(levels(data$model)==str_to_title(model)), 
-                                   as.numeric(Sys.Date()-as.Date(ad_date)))))
+#   city <-  ifelse(city == "istanbul", "İstanbul", city)
+#   deploy_values <- t(data.matrix(c(as.numeric(substr(Sys.Date(),1,4)) - as.numeric(year),
+#                                    km, 
+#                                    which(levels(data$color)==str_to_title(color)), 
+#                                    which(levels(data$city)==str_to_title(city)), 
+#                                    which(levels(data$brand)==str_to_title(brand)), 
+#                                    which(levels(data$model)==str_to_title(model)), 
+#                                    as.numeric(Sys.Date()-as.Date(ad_date)))))
   
   
-  #colnames(deploy_values) <- colnames(xgb_test)[-1]
-  return(predict(xgb_model,deploy_values))  
-}
-
-
+#   #colnames(deploy_values) <- colnames(xgb_test)[-1]
+#   return(predict(xgb_model,deploy_values))  
+# }
