@@ -16,14 +16,14 @@ source("functions.R")
 
 system("clear")
 
-# cat("Enter the brand: ");
-# brand <- readLines("stdin",n=1);
-# 
-# cat("Enter the model: ");
-# model <- readLines("stdin",n=1);
+cat("Enter the brand: ");
+brand <- readLines("stdin",n=1);
 
-brand <- "Volkswagen"
-model <- "Passat"
+cat("Enter the model: ");
+model <- readLines("stdin",n=1);
+
+# brand <- "Volkswagen"
+# model <- "Passat"
 
 
 brand_ <- gsub("\ ", '-', brand, perl=T)
@@ -70,10 +70,7 @@ if(max_page <= 1 || length(max_page)==0){
   url <- url[-1]
   
   for(i in 1:length(url)){
-    html <- read_html(url[i])
-    
-    #max_page <- get_max_page(html = html)
-    
+    html <- read_html(url[i])   
     attrbs <- get_attrb(html)
     price <- get_price(html)
     locat <- get_location(html)
@@ -103,17 +100,16 @@ if(max_page <= 1 || length(max_page)==0){
 }
 
 
-ege <- as.data.frame(dt)
+dt <- as.data.frame(dt)
 
+dt$brand <- ifelse(tolower(brand) == "bmw", "BMW", str_to_title(brand))
+dt$model <- str_to_title(model)
 
-ege$brand <- ifelse(tolower(brand) == "bmw", "BMW", str_to_title(brand))
-ege$model <- str_to_title(model)
-
-write.table(file=paste0("data/",tolower(brand_),"-",tolower(model_),".csv"), ege, sep = ";", quote = FALSE)
+write.table(file=paste0("data/",tolower(brand_),"-",tolower(model_),".csv"), dt, sep = ";", quote = FALSE)
 
 end_ <- Sys.time() 
 time_ <- round(difftime(end_, start_, units='secs'),2)
 
 system("clear")
-cat(paste0("This process took ", time_, " seconds, with ",nrow(ege), " results\n\n"))
+cat(paste0("This process took ", time_, " seconds, with ",nrow(dt), " results\n\n"))
 cat(paste0("Successful! Please locate the file here:\n", getwd(),"/data/",paste0(tolower(brand_),"-",tolower(model_),".csv\n\n")))
